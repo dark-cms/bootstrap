@@ -44,13 +44,14 @@
       , offset = this.options.offset
       , offsetBottom = offset.bottom
       , offsetTop = offset.top
+      , bottomPosition = offset.bottomposition || false
       , reset = 'affix affix-top affix-bottom'
       , affix
 
     if (typeof offset != 'object') offsetBottom = offsetTop = offset
     if (typeof offsetTop == 'function') offsetTop = offset.top()
     if (typeof offsetBottom == 'function') offsetBottom = offset.bottom()
-
+    if (typeof bottomPosition == 'function') bottomPosition = offset.bottomposition()
     affix = this.unpin != null && (scrollTop + this.unpin <= position.top) ?
       false    : offsetBottom != null && (position.top + this.$element.height() >= scrollHeight - offsetBottom) ?
       'bottom' : offsetTop != null && scrollTop <= offsetTop ?
@@ -61,7 +62,17 @@
     this.affixed = affix
     this.unpin = affix == 'bottom' ? position.top - scrollTop : null
 
-    this.$element.removeClass(reset).addClass('affix' + (affix ? '-' + affix : ''))
+    this.$element.removeClass(reset).addClass('affix' + (affix ? '-' + affix : ''));
+    /****
+     * add this to the offset-object of your .affix()
+     * bottomposition: function() {
+     *      return parseInt($document.height() - ($('#affixparent').offset().top + $('#affixparent').height())); 
+     *  } 
+     * and the system will autocalculate the bottomposition of your affix (no silly css code)
+     * nice for dynamic footer or responsive layouts
+     ****/ 
+    this.$element.css('bottom',(affix == 'bottom' && bottomPosition)?bottomPosition:'');
+    
   }
 
 
